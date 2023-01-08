@@ -1,8 +1,15 @@
 import time
-import TCPServer
-TCPServer.start_server(63001)
-TCPServer.start_recieve()
+import TCPServer #link to TCP Server
+TCPServer.start_server(63000) #start tcp server on port 6300x
+TCPServer.start_recieve() # start monitoring connections
+global getlast
+getlast = 'nowt'
+
 while True:
-    print('cake')
-    time.sleep(10)
-    TCPServer.broadcast('did i mention cakes'.encode('ascii'))
+    previous = getlast
+    getlast = TCPServer.returnmessage()
+    if getlast != previous:
+            output = getlast.decode('ascii')[:-2] + ' is a thing\n'
+            output = output.encode('ascii')
+            TCPServer.broadcast(output)
+            TCPServer.broadcast('or is it\n'.encode('ascii'))
