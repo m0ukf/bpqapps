@@ -6,13 +6,15 @@ host = '127.0.0.1'
 AppServer = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 clients = []
 global lastmessage
-
+global lastclient
 
 def start_server(port):  #connect to specified port and start listening
     AppServer.bind((host, port))
     AppServer.listen()
     global lastmessage
+    global lastclient
     lastmessage='cake'.encode('ascii')
+    lastclient=1
 
 # Start listening for new connection in a thread 
 def start_recieve():
@@ -33,8 +35,10 @@ def start_accepting_connections():
 def handle(client,): 
     while True:
         try:
+            global lastclient
             message = client.recv(1024)
             queueup(message)
+            lastclient = clients.index(client)
         except: #deal with a disconnect
             index = clients.index(client)
             clients.remove(client)
@@ -44,6 +48,10 @@ def handle(client,):
 def broadcast(message):
     for client in clients:
         client.send(message)
+
+def DirectMessage(message,client):
+    clients[client].send(message)
+
 def queueup(message):
     global lastmessage    
     lastmessage=message
@@ -51,3 +59,6 @@ def queueup(message):
 def returnmessage():
     global lastmessage
     return lastmessage
+def returnclient():
+    global lastclient
+    return lastclient
